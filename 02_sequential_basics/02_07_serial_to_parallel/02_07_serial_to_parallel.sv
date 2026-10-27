@@ -27,5 +27,24 @@ module serial_to_parallel
     // Note:
     // Check the waveform diagram in the README for better understanding.
 
+    logic [width-1:0] shreg;
+    logic [$clog2(width)-1:0] cnt;
+
+    assign parallel_data = { serial_data, shreg[width-1:1] };
+    assign parallel_valid = serial_valid & (cnt == width - 1);
+
+
+    always_ff @( posedge clk ) begin
+    if(rst) begin
+        cnt <= '0;
+    end else begin
+        if(serial_valid) begin
+        shreg <= parallel_data;
+
+        if(cnt == width - 1) cnt <= '0;
+        else cnt <= cnt + 1'b1;
+        end
+    end
+    end
 
 endmodule
